@@ -153,7 +153,7 @@ xattr -dr com.apple.quarantine "/path/to/FORGE"
 forge/
 ├── START FORGE.command             # One-click launcher (macOS)
 ├── public/
-│   └── warriors/                   # Warrior PNG images (8 of 11 complete)
+│   └── warriors/                   # Warrior PNG images (all 11 tiers complete)
 │       ├── recruit.png
 │       ├── initiated.png
 │       ├── iron.png
@@ -161,7 +161,10 @@ forge/
 │       ├── titan.png
 │       ├── apex.png
 │       ├── legend.png
-│       └── mythic.png              # immortal / ascended / forged pending
+│       ├── mythic.png
+│       ├── immortal.png
+│       ├── ascended.png
+│       └── forged.png
 ├── src/
 │   ├── App.jsx                     # Main shell — layout, tabs, modals, stat cards
 │   ├── index.css                   # Design system — CSS tokens
