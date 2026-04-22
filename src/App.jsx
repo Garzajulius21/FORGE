@@ -98,15 +98,32 @@ function TodaySummary({ todayLog, userGoals }) {
 }
 
 export default function App() {
-  const { state, levelInfo, currentTitle, lostSoFar, toGoal, userGoals, logDay, quickLog, saveGoals, completeProfile, reopenProfile, editLog, dismissMilestone } = useForge();
+  const { state, levelInfo, currentTitle, lostSoFar, toGoal, userGoals, logDay, quickLog, saveGoals, completeProfile, reopenProfile, editLog, dismissMilestone, loadSave } = useForge();
   const [showLog, setShowLog] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [levelUpData, setLevelUpData] = useState(null);
   const [floatingXPs, setFloatingXPs] = useState([]);
-  const prevLevel = useRef(levelInfo.level);
-  const prevXP    = useRef(state.totalXP);
-  const prevTitle = useRef(currentTitle);
+  const prevLevel   = useRef(levelInfo.level);
+  const prevXP      = useRef(state.totalXP);
+  const prevTitle   = useRef(currentTitle);
+  const importRef   = useRef(null);
+
+  function handleImport(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        loadSave(data);
+      } catch {
+        alert('Invalid save file — could not restore.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
 
   // Detect level up
   useEffect(() => {
@@ -159,6 +176,21 @@ export default function App() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {/* Import save */}
+          <input
+            ref={importRef}
+            type="file"
+            accept=".json"
+            onChange={handleImport}
+            style={{ display: 'none' }}
+          />
+          <button
+            onClick={() => importRef.current?.click()}
+            title="Restore save file"
+            style={{ background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:'9px', padding:'9px', color:'var(--muted)', display:'flex', alignItems:'center' }}
+          >
+            <Upload size={16} />
+          </button>
           {/* Export save */}
           <button
             onClick={() => {
@@ -430,7 +462,7 @@ export default function App() {
 
         {activeTab === 'History' && (
           <div className="fade-in">
-            <HistoryTab logs={state.logs} onEdit={editLog} />
+            <HistoryTab logs={state.logs} onEdit={editLog} userGoals={userGoals} />
           </div>
         )}
       </div>

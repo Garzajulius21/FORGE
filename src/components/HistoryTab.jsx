@@ -1,15 +1,13 @@
 import { useState } from 'react';
 import { Pencil } from 'lucide-react';
 import LogModal from './LogModal';
-import { DAILY_GOALS } from '../data/constants';
-
 function fmt(date) {
   return new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
   });
 }
 
-export default function HistoryTab({ logs, onEdit }) {
+export default function HistoryTab({ logs, onEdit, userGoals }) {
   const [editingLog, setEditingLog] = useState(null);
 
   const sorted = [...logs].sort((a, b) => b.date.localeCompare(a.date));
@@ -77,8 +75,8 @@ export default function HistoryTab({ logs, onEdit }) {
             </thead>
             <tbody>
               {sorted.map((log, i) => {
-                const calOver = log.calories && log.calories > DAILY_GOALS.calories;
-                const waterGood = log.water && log.water >= DAILY_GOALS.water;
+                const calOver = log.calories && log.calories > (userGoals?.calories ?? 2000);
+                const waterGood = log.water && log.water >= (userGoals?.water ?? 64);
                 const isToday = log.date === new Date().toISOString().split('T')[0];
 
                 return (

@@ -409,6 +409,11 @@ export function useForge() {
     setState(prev => ({ ...prev, newMilestone: null }));
   }
 
+  function loadSave(data) {
+    saveState(data);
+    setStateRaw(data);
+  }
+
   const levelInfo = getLevel(refreshedState.totalXP);
   const currentTitle = getCurrentTitle(refreshedState.profile.currentWeight);
   const lostSoFar = START_WEIGHT - refreshedState.profile.currentWeight;
@@ -430,5 +435,6 @@ export function useForge() {
     reopenProfile,
     editLog,
     dismissMilestone,
+    loadSave,
   };
 }
