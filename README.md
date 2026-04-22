@@ -1,4 +1,4 @@
-# FORGE — Dark Fantasy Fitness Tracker
+# FORGE — RPG Fitness Tracker
 
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 ![Stack](https://img.shields.io/badge/Stack-React%20%2B%20Vite-blue?style=for-the-badge)
@@ -11,11 +11,9 @@
 
 ## Overview
 
-FORGE is a personal fitness tracker wrapped in a dark fantasy RPG shell. Log your weight, calories, water, and workouts every day — and watch your warrior evolve. Every pound lost advances you through 11 warrior tiers, from **Recruit** to the final form: **FORGED**.
+FORGE is a personal fitness tracker with RPG progression built in. Log your weight, calories, water, and workouts every day — and watch your warrior evolve. Every 10 lbs lost advances you through 11 warrior tiers, from **Recruit** to the final form: **FORGED**.
 
 No cloud. No account. No subscriptions. Everything lives in your browser's localStorage and runs off a single double-click.
-
-> **Built for one person with one goal** — 290 lbs down to 200. 90 lbs. Forged.
 
 ---
 
@@ -23,19 +21,19 @@ No cloud. No account. No subscriptions. Everything lives in your browser's local
 
 Your warrior title is determined by how much weight you've lost. Each tier unlocks a new warrior image, a new badge, and a milestone toast notification.
 
-| Tier | Title | Goal Weight | lbs Lost |
-|------|-------|-------------|----------|
-| 1 | Recruit | 290 lbs | 0 |
-| 2 | Initiated | 285 lbs | 5 |
-| 3 | Iron | 280 lbs | 10 |
-| 4 | Steel | 270 lbs | 20 |
-| 5 | Titan | 260 lbs | 30 |
-| 6 | Apex | 250 lbs | 40 |
-| 7 | Legend | 240 lbs | 50 |
-| 8 | Mythic | 230 lbs | 60 |
-| 9 | Immortal | 220 lbs | 70 |
-| 10 | Ascended | 210 lbs | 80 |
-| 11 | **FORGED** | 200 lbs | 90 |
+| Tier | Title | lbs Lost |
+|------|-------|----------|
+| 1 | Recruit | 0 |
+| 2 | Initiated | 5 |
+| 3 | Iron | 10 |
+| 4 | Steel | 20 |
+| 5 | Titan | 30 |
+| 6 | Apex | 40 |
+| 7 | Legend | 50 |
+| 8 | Mythic | 60 |
+| 9 | Immortal | 70 |
+| 10 | Ascended | 80 |
+| 11 | **FORGED** | 90 |
 
 ---
 
@@ -166,7 +164,7 @@ forge/
 │       └── mythic.png              # immortal / ascended / forged pending
 ├── src/
 │   ├── App.jsx                     # Main shell — layout, tabs, modals, stat cards
-│   ├── index.css                   # Design system — dark fantasy CSS tokens
+│   ├── index.css                   # Design system — CSS tokens
 │   ├── hooks/
 │   │   └── useForge.js             # All state — XP, quests, logs, streaks, milestones
 │   ├── components/
@@ -213,4 +211,4 @@ Private — not for redistribution.
 
 ---
 
-*Built for the grind · 290 → 200 · One day at a time*
+*Built for the grind · One day at a time*
