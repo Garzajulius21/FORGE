@@ -143,6 +143,7 @@ input {
 /* Mobile */
 @media (max-width: 768px) {
   .grid-4 { grid-template-columns: repeat(2,1fr) !important; }
+  .grid-5 { grid-template-columns: repeat(2,1fr) !important; }
   .grid-2 { grid-template-columns: 1fr !important; }
   .grid-quests { grid-template-columns: 1fr !important; }
   .hero-panel { flex-direction: column !important; align-items: center !important; padding: 16px !important; }
@@ -153,5 +154,6 @@ input {
 }
 @media (max-width: 480px) {
   .grid-4 { grid-template-columns: 1fr 1fr !important; }
+  .grid-5 { grid-template-columns: 1fr 1fr !important; }
   .main-pad { padding: 12px !important; }
 }

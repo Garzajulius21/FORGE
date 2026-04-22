@@ -154,6 +154,16 @@ export default function App() {
 
   const lostPct = Math.min((lostSoFar / (START_WEIGHT - GOAL_WEIGHT)) * 100, 100);
 
+  const bmiData = (() => {
+    const p = state.userProfile;
+    if (!p?.heightFt) return null;
+    const heightIn = p.heightFt * 12 + (p.heightIn || 0);
+    const val = parseFloat(((state.profile.currentWeight / (heightIn * heightIn)) * 703).toFixed(1));
+    const cat   = val < 18.5 ? 'Underweight' : val < 25 ? 'Normal' : val < 30 ? 'Overweight' : 'Obese';
+    const color = val < 18.5 ? 'var(--blue)' : val < 25 ? 'var(--green)' : val < 30 ? 'var(--amber)' : 'var(--red)';
+    return { val, cat, color };
+  })();
+
   const tabIcon = { Dashboard: <LayoutDashboard size={15} />, Milestones: <Map size={15} />, Activity: <Activity size={15} />, History: <History size={15} /> };
 
   return (
@@ -283,7 +293,7 @@ export default function App() {
           <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
             {/* Stat cards */}
-            <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+            <div className={bmiData ? 'grid-5' : 'grid-4'} style={{ display: 'grid', gridTemplateColumns: `repeat(${bmiData ? 5 : 4}, 1fr)`, gap: '12px' }}>
               <StatCard
                 label="CURRENT WEIGHT"
                 value={`${state.profile.currentWeight} lbs`}
@@ -312,6 +322,15 @@ export default function App() {
                 color="#a78bfa"
                 accent="#a78bfa"
               />
+              {bmiData && (
+                <StatCard
+                  label="BMI"
+                  value={bmiData.val}
+                  sub={bmiData.cat}
+                  color={bmiData.color}
+                  accent={bmiData.color}
+                />
+              )}
             </div>
 
             {/* Progress bar (weight) */}

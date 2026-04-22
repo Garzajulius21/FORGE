@@ -1,4 +1,9 @@
+import { useState } from 'react';
 import { START_WEIGHT, GOAL_WEIGHT } from '../data/constants';
+
+function fmtDate(dateStr) {
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
 // Smooth bezier curve through points
 function smoothPath(pts) {
@@ -20,6 +25,7 @@ function smoothPath(pts) {
 }
 
 export default function WeightChart({ logs }) {
+  const [hovered, setHovered] = useState(null);
   const recent = [...logs].reverse().slice(-30);
 
   if (recent.length === 0) {
@@ -138,12 +144,37 @@ export default function WeightChart({ logs }) {
 
         {/* Data points */}
         {pts.map((pt, i) => (
-          <g key={i}>
-            <circle cx={pt.x} cy={pt.y} r="4" fill="#f59e0b" opacity="0.12" />
-            <circle cx={pt.x} cy={pt.y} r="2.2" fill="#f59e0b" />
+          <g key={i}
+            onMouseEnter={() => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}
+            style={{ cursor: 'crosshair' }}
+          >
+            <circle cx={pt.x} cy={pt.y} r="6" fill="transparent" />
+            <circle cx={pt.x} cy={pt.y} r={hovered === i ? 3.5 : 2.2} fill="#f59e0b" style={{ transition: 'r 0.1s' }} />
             <circle cx={pt.x} cy={pt.y} r="0.9" fill="#fff" opacity="0.85" />
           </g>
         ))}
+
+        {/* Tooltip */}
+        {hovered !== null && (() => {
+          const pt = pts[hovered];
+          const log = weightLogs[hovered];
+          const tipW = 46, tipH = 20;
+          const tx = Math.max(tipW / 2 + 2, Math.min(W - tipW / 2 - 2, pt.x));
+          const ty = Math.max(tipH + 6, pt.y - 8);
+          return (
+            <g pointerEvents="none">
+              <rect x={tx - tipW / 2} y={ty - tipH} width={tipW} height={tipH} rx="3"
+                fill="#1a1a21" stroke="#f59e0b" strokeWidth="0.6" opacity="0.97" />
+              <text x={tx} y={ty - tipH / 2 + 2} textAnchor="middle" fontSize="5.5" fill="#f59e0b" fontWeight="bold">
+                {log.weight} lbs
+              </text>
+              <text x={tx} y={ty - tipH / 2 + 8.5} textAnchor="middle" fontSize="4.2" fill="#94a3b8">
+                {fmtDate(log.date)}
+              </text>
+            </g>
+          );
+        })()}
 
         {/* First weight label */}
         {pts.length > 0 && (
@@ -160,8 +191,8 @@ export default function WeightChart({ logs }) {
 
       {/* Date range */}
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>
-        <span>{weightLogs[0]?.date}</span>
-        <span>{weightLogs[weightLogs.length - 1]?.date}</span>
+        <span>{weightLogs[0] ? fmtDate(weightLogs[0].date) : ''}</span>
+        <span>{weightLogs[weightLogs.length - 1] ? fmtDate(weightLogs[weightLogs.length - 1].date) : ''}</span>
       </div>
     </div>
   );
