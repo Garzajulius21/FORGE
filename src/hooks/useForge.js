@@ -197,13 +197,20 @@ export function useForge() {
         xpEvents.push({ label: 'Hit water goal', xp: XP_VALUES.HIT_WATER_GOAL });
       }
 
+      const WORKOUT_XP = {
+        gym: XP_VALUES.GYM, walk: XP_VALUES.WALK, run: XP_VALUES.RUN,
+        swim: XP_VALUES.SWIM, bike: XP_VALUES.BIKE, yoga: XP_VALUES.YOGA,
+      };
+      const WORKOUT_LABEL = {
+        gym: 'Gym session', walk: 'Walk logged', run: 'Run logged',
+        swim: 'Swim logged', bike: 'Bike ride logged', yoga: 'Yoga session',
+      };
       workouts.forEach(w => {
         const alreadyDone = existing?.workouts?.includes(w);
         if (alreadyDone) return;
-        const val = w === 'gym' ? XP_VALUES.GYM : XP_VALUES.WALK;
-        const label = w === 'gym' ? 'Gym session' : 'Walk logged';
+        const val = WORKOUT_XP[w] ?? XP_VALUES.WALK;
         xpEarned += val;
-        xpEvents.push({ label, xp: val });
+        xpEvents.push({ label: WORKOUT_LABEL[w] ?? `${w} logged`, xp: val });
       });
 
       // Streak bonuses
@@ -276,13 +283,21 @@ export function useForge() {
       if (q.completed) return q;
       let completed = false;
       switch (q.type) {
-        case 'log_weight':   completed = !!weight; break;
-        case 'log_calories': completed = !!calories; break;
-        case 'hit_calories': completed = !!(calories && calories <= DAILY_GOALS.calories); break;
-        case 'hit_water':    completed = !!(water && water >= DAILY_GOALS.water); break;
-        case 'walk':         completed = workouts.includes('walk'); break;
-        case 'gym':          completed = workouts.includes('gym'); break;
-        case 'log_all':      completed = !!weight && !!calories && !!water; break;
+        case 'log_weight':    completed = !!weight; break;
+        case 'log_calories':  completed = !!calories; break;
+        case 'hit_calories':  completed = !!(calories && calories <= DAILY_GOALS.calories); break;
+        case 'hit_water':     completed = !!(water && water >= DAILY_GOALS.water); break;
+        case 'big_water':     completed = !!(water && water >= 80); break;
+        case 'walk':          completed = workouts.includes('walk'); break;
+        case 'gym':           completed = workouts.includes('gym'); break;
+        case 'run':           completed = workouts.includes('run'); break;
+        case 'swim':          completed = workouts.includes('swim'); break;
+        case 'bike':          completed = workouts.includes('bike'); break;
+        case 'yoga':          completed = workouts.includes('yoga'); break;
+        case 'any_workout':   completed = workouts.length > 0; break;
+        case 'two_workouts':  completed = workouts.length >= 2; break;
+        case 'weight_and_cals': completed = !!weight && !!calories; break;
+        case 'log_all':       completed = !!weight && !!calories && !!water; break;
         default: break;
       }
       if (completed) {
@@ -302,13 +317,22 @@ export function useForge() {
       if (q.completed) return q;
       let progress = 0;
       switch (q.type) {
-        case 'weight_logs':   progress = weekLogs.filter(l => l.weight).length; break;
-        case 'water_hits':    progress = weekLogs.filter(l => l.water >= DAILY_GOALS.water).length; break;
-        case 'gym_visits':    progress = weekLogs.filter(l => l.workouts?.includes('gym')).length; break;
-        case 'walk_logs':     progress = weekLogs.filter(l => l.workouts?.includes('walk')).length; break;
-        case 'calorie_hits':  progress = weekLogs.filter(l => l.calories && l.calories <= DAILY_GOALS.calories).length; break;
-        case 'streak':        progress = Math.min(streak, q.target); break;
-        case 'full_logs':     progress = weekLogs.filter(l => l.weight && l.calories && l.water).length; break;
+        case 'weight_logs':      progress = weekLogs.filter(l => l.weight).length; break;
+        case 'water_hits':       progress = weekLogs.filter(l => l.water >= DAILY_GOALS.water).length; break;
+        case 'gym_visits':       progress = weekLogs.filter(l => l.workouts?.includes('gym')).length; break;
+        case 'walk_logs':        progress = weekLogs.filter(l => l.workouts?.includes('walk')).length; break;
+        case 'run_logs':         progress = weekLogs.filter(l => l.workouts?.includes('run')).length; break;
+        case 'swim_logs':        progress = weekLogs.filter(l => l.workouts?.includes('swim')).length; break;
+        case 'yoga_logs':        progress = weekLogs.filter(l => l.workouts?.includes('yoga')).length; break;
+        case 'any_workout_logs': progress = weekLogs.filter(l => l.workouts?.length > 0).length; break;
+        case 'workout_variety': {
+          const types = new Set(weekLogs.flatMap(l => l.workouts || []));
+          progress = types.size;
+          break;
+        }
+        case 'calorie_hits':     progress = weekLogs.filter(l => l.calories && l.calories <= DAILY_GOALS.calories).length; break;
+        case 'streak':           progress = Math.min(streak, q.target); break;
+        case 'full_logs':        progress = weekLogs.filter(l => l.weight && l.calories && l.water).length; break;
         default: break;
       }
       const completed = progress >= q.target;

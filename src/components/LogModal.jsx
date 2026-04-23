@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Dumbbell, Footprints, Droplets, Flame, Weight, NotebookPen } from 'lucide-react';
+import { X, Dumbbell, Footprints, Droplets, Flame, Weight, NotebookPen, Zap, Waves, Bike, Leaf } from 'lucide-react';
 
 function fmtDate(date) {
   return new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
@@ -132,10 +132,14 @@ export default function LogModal({ onClose, onSubmit, todayLog, editMode, editDa
           {/* Workouts */}
           <div>
             <label style={{ ...labelStyle, marginBottom: '10px' }}>WORKOUTS</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
               {[
-                { type: 'walk', label: 'Walk', xp: '+100 XP', icon: <Footprints size={20} /> },
-                { type: 'gym',  label: 'Gym',  xp: '+300 XP', icon: <Dumbbell size={20} /> },
+                { type: 'walk',  label: 'Walk',  xp: '+100', icon: <Footprints size={18} /> },
+                { type: 'run',   label: 'Run',   xp: '+200', icon: <Zap size={18} /> },
+                { type: 'gym',   label: 'Gym',   xp: '+300', icon: <Dumbbell size={18} /> },
+                { type: 'bike',  label: 'Bike',  xp: '+150', icon: <Bike size={18} /> },
+                { type: 'swim',  label: 'Swim',  xp: '+250', icon: <Waves size={18} /> },
+                { type: 'yoga',  label: 'Yoga',  xp: '+80',  icon: <Leaf size={18} /> },
               ].map(({ type, label, xp, icon }) => {
                 const active = workouts.includes(type);
                 return (
@@ -147,7 +151,7 @@ export default function LogModal({ onClose, onSubmit, todayLog, editMode, editDa
                       background: active ? 'var(--amber-glow)' : 'var(--surface2)',
                       border: `2px solid ${active ? 'var(--amber)' : 'var(--border)'}`,
                       borderRadius: '10px',
-                      padding: '12px',
+                      padding: '10px 8px',
                       color: active ? 'var(--amber)' : 'var(--muted2)',
                       display: 'flex',
                       flexDirection: 'column',
@@ -157,8 +161,8 @@ export default function LogModal({ onClose, onSubmit, todayLog, editMode, editDa
                     }}
                   >
                     {icon}
-                    <span style={{ fontWeight: 700, fontSize: '13px' }}>{label}</span>
-                    <span style={{ fontSize: '11px', color: active ? 'var(--amber)' : 'var(--muted)' }}>{xp}</span>
+                    <span style={{ fontWeight: 700, fontSize: '12px' }}>{label}</span>
+                    <span style={{ fontSize: '10px', color: active ? 'var(--amber)' : 'var(--muted)' }}>{xp} XP</span>
                   </button>
                 );
               })}
