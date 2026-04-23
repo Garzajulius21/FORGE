@@ -98,7 +98,7 @@ function TodaySummary({ todayLog, userGoals }) {
 }
 
 export default function App() {
-  const { state, levelInfo, currentTitle, lostSoFar, toGoal, userGoals, logDay, quickLog, saveGoals, completeProfile, reopenProfile, editLog, dismissMilestone, loadSave } = useForge();
+  const { state, levelInfo, currentTitle, lostSoFar, toGoal, userGoals, logDay, quickLog, saveGoals, completeProfile, reopenProfile, editLog, dismissMilestone, loadSave, resetData } = useForge();
   const [showLog, setShowLog] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -501,6 +501,7 @@ export default function App() {
           userGoals={userGoals}
           onSave={saveGoals}
           onEditProfile={() => { setShowSettings(false); reopenProfile(); }}
+          onReset={() => { resetData(); setShowSettings(false); }}
         />
       )}
 
