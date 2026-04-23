@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Dumbbell, Footprints, Droplets, Flame, Weight } from 'lucide-react';
+import { X, Dumbbell, Footprints, Droplets, Flame, Weight, NotebookPen } from 'lucide-react';
 
 function fmtDate(date) {
   return new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
@@ -8,10 +8,11 @@ function fmtDate(date) {
 }
 
 export default function LogModal({ onClose, onSubmit, todayLog, editMode, editDate }) {
-  const [weight, setWeight] = useState(todayLog?.weight || '');
+  const [weight, setWeight]     = useState(todayLog?.weight || '');
   const [calories, setCalories] = useState(todayLog?.calories || '');
-  const [water, setWater] = useState(todayLog?.water || '');
+  const [water, setWater]       = useState(todayLog?.water || '');
   const [workouts, setWorkouts] = useState(todayLog?.workouts || []);
+  const [notes, setNotes]       = useState(todayLog?.notes || '');
 
   function toggleWorkout(type) {
     setWorkouts(prev =>
@@ -26,6 +27,7 @@ export default function LogModal({ onClose, onSubmit, todayLog, editMode, editDa
       calories: calories ? parseInt(calories) : null,
       water: water ? parseInt(water) : null,
       workouts,
+      notes: notes.trim(),
     });
     onClose();
   }
@@ -161,6 +163,24 @@ export default function LogModal({ onClose, onSubmit, todayLog, editMode, editDa
                 );
               })}
             </div>
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label style={labelStyle}><NotebookPen size={14} /> NOTES <span style={{ color: 'var(--muted)', marginLeft: 'auto', fontWeight: 400, fontSize: '11px' }}>optional</span></label>
+            <textarea
+              placeholder="How did today feel? Any wins or struggles..."
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              maxLength={280}
+              rows={2}
+              style={{
+                ...inputStyle,
+                resize: 'vertical',
+                minHeight: '64px',
+                lineHeight: 1.5,
+              }}
+            />
           </div>
 
           <button

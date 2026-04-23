@@ -86,6 +86,11 @@ export default function HistoryTab({ logs, onEdit, userGoals }) {
                         {fmt(log.date)}
                         {isToday && <span style={{ fontSize: '10px', marginLeft: '6px', background: 'var(--amber-glow)', color: 'var(--amber)', border: '1px solid var(--amber)', borderRadius: '4px', padding: '1px 5px', fontWeight: 700 }}>TODAY</span>}
                       </div>
+                      {log.notes && (
+                        <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '3px', fontStyle: 'italic', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={log.notes}>
+                          "{log.notes}"
+                        </div>
+                      )}
                     </td>
                     <td style={tdStyle}>
                       {log.weight ? (

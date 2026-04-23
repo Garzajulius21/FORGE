@@ -1,4 +1,4 @@
-export default function XPBar({ levelInfo, totalXP, streak, currentTitle }) {
+export default function XPBar({ levelInfo, totalXP, streak, streakShields, currentTitle }) {
   const pct = Math.round(levelInfo.progress * 100);
 
   return (
@@ -95,6 +95,16 @@ export default function XPBar({ levelInfo, totalXP, streak, currentTitle }) {
           <div style={{ fontSize: '18px', fontWeight: 800, color: streak > 0 ? '#f87171' : 'var(--muted)', lineHeight: 1 }}>{streak}</div>
           <div style={{ fontSize: '10px', color: 'var(--muted)', letterSpacing: '0.06em' }}>DAY STREAK</div>
         </div>
+        {streakShields > 0 && (
+          <div title="Streak Shield — protects your streak if you miss a day" style={{
+            marginLeft: '2px',
+            fontSize: '16px',
+            lineHeight: 1,
+            filter: 'drop-shadow(0 0 4px rgba(96,165,250,0.7))',
+          }}>
+            🛡️
+          </div>
+        )}
       </div>
     </div>
   );

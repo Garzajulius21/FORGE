@@ -68,6 +68,8 @@ function defaultState() {
     },
     totalXP: 0,
     streak: 0,
+    streakShields: 1,
+    lastShieldWeek: weekStart(),
     lastLogDate: null,
     logs: [],
     activities: [],
@@ -75,6 +77,7 @@ function defaultState() {
     weeklyQuests: { week: weekStart(), quests: pickWeeklyQuests() },
     unlockedMilestones: ['start'],
     newMilestone: null,
+    recalcDismissedAtWeight: null,
   };
 }
 
@@ -103,7 +106,7 @@ export function useForge() {
     });
   }, []);
 
-  // Refresh quests if day/week has changed
+  // Refresh quests + streak shield if day/week has changed
   const refreshedState = (() => {
     const today = todayStr();
     const week = weekStart();
@@ -118,9 +121,13 @@ export function useForge() {
       s = { ...s, weeklyQuests: { week, quests: pickWeeklyQuests() } };
       changed = true;
     }
+    // Replenish 1 streak shield at the start of each new week
+    if ((s.lastShieldWeek || '') !== week && s.streakShields < 1) {
+      s = { ...s, streakShields: 1, lastShieldWeek: week };
+      changed = true;
+    }
     if (changed) {
       saveState(s);
-      // update state async to avoid render loop
       setTimeout(() => setStateRaw(s), 0);
     }
     return s;
@@ -138,22 +145,33 @@ export function useForge() {
     });
   }
 
-  function logDay({ weight, calories, water, workouts = [] }) {
+  function logDay({ weight, calories, water, workouts = [], notes = '' }) {
     setState(prev => {
       const today = todayStr();
       let xpEarned = 0;
       const xpEvents = [];
 
-      // Streak
+      // Streak + shield logic
       let streak = prev.streak;
+      let streakShields = prev.streakShields ?? 1;
       if (prev.lastLogDate === today) {
-        // already logged today, just update
+        // already logged today, just update — no streak change
       } else {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         const yStr = yesterday.toISOString().split('T')[0];
+        const dayBefore = new Date();
+        dayBefore.setDate(dayBefore.getDate() - 2);
+        const dbStr = dayBefore.toISOString().split('T')[0];
+
         if (prev.lastLogDate === yStr) {
+          // Logged yesterday — normal streak increment
           streak = streak + 1;
+        } else if (prev.lastLogDate === dbStr && streakShields > 0) {
+          // Missed exactly 1 day — consume a shield, keep streak alive
+          streak = streak + 1;
+          streakShields = streakShields - 1;
+          xpEvents.push({ label: 'Streak shield used — streak saved!', xp: 0 });
         } else if (prev.lastLogDate !== today) {
           streak = 1;
         }
@@ -196,7 +214,7 @@ export function useForge() {
 
       // Update log entry for today
       const existingIdx = prev.logs.findIndex(l => l.date === today);
-      const logEntry = { date: today, weight, calories, water, workouts };
+      const logEntry = { date: today, weight, calories, water, workouts, notes };
       const logs = existingIdx >= 0
         ? prev.logs.map((l, i) => i === existingIdx ? logEntry : l)
         : [logEntry, ...prev.logs];
@@ -238,6 +256,7 @@ export function useForge() {
         ...prev,
         totalXP: finalXP,
         streak,
+        streakShields,
         lastLogDate: today,
         logs,
         activities: [...questActivities, ...newActivities, ...prev.activities].slice(0, 100),
@@ -387,10 +406,10 @@ export function useForge() {
     setState(prev => ({ ...prev, profileComplete: false }));
   }
 
-  function editLog(date, { weight, calories, water, workouts }) {
+  function editLog(date, { weight, calories, water, workouts, notes }) {
     setState(prev => {
       const logs = prev.logs.map(l =>
-        l.date === date ? { ...l, weight, calories, water, workouts } : l
+        l.date === date ? { ...l, weight, calories, water, workouts, notes } : l
       );
       // Recalculate current weight from most recent log that has a weight
       const latestWithWeight = [...logs].sort((a, b) => b.date.localeCompare(a.date)).find(l => l.weight);
@@ -420,6 +439,10 @@ export function useForge() {
     setStateRaw(fresh);
   }
 
+  function dismissRecalc() {
+    setState(prev => ({ ...prev, recalcDismissedAtWeight: prev.profile.currentWeight }));
+  }
+
   const levelInfo = getLevel(refreshedState.totalXP);
   const currentTitle = getCurrentTitle(refreshedState.profile.currentWeight);
   const lostSoFar = START_WEIGHT - refreshedState.profile.currentWeight;
@@ -443,5 +466,6 @@ export function useForge() {
     dismissMilestone,
     loadSave,
     resetData,
+    dismissRecalc,
   };
 }

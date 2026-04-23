@@ -98,7 +98,7 @@ function TodaySummary({ todayLog, userGoals }) {
 }
 
 export default function App() {
-  const { state, levelInfo, currentTitle, lostSoFar, toGoal, userGoals, logDay, quickLog, saveGoals, completeProfile, reopenProfile, editLog, dismissMilestone, loadSave, resetData } = useForge();
+  const { state, levelInfo, currentTitle, lostSoFar, toGoal, userGoals, logDay, quickLog, saveGoals, completeProfile, reopenProfile, editLog, dismissMilestone, loadSave, resetData, dismissRecalc } = useForge();
   const [showLog, setShowLog] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -153,6 +153,16 @@ export default function App() {
   const todayLog = state.logs.find(l => l.date === todayStr);
 
   const lostPct = Math.min((lostSoFar / (START_WEIGHT - GOAL_WEIGHT)) * 100, 100);
+
+  const showRecalcNudge = (() => {
+    const p = state.userProfile;
+    if (!p) return false;
+    const lostSinceSetup = p.weightLbs - state.profile.currentWeight;
+    if (lostSinceSetup < 15) return false;
+    const dismissed = state.recalcDismissedAtWeight;
+    if (dismissed && state.profile.currentWeight > dismissed - 15) return false;
+    return true;
+  })();
 
   const bmiData = (() => {
     const p = state.userProfile;
@@ -253,7 +263,7 @@ export default function App() {
       </div>
 
       {/* XP Bar */}
-      <XPBar levelInfo={levelInfo} totalXP={state.totalXP} streak={state.streak} currentTitle={currentTitle} />
+      <XPBar levelInfo={levelInfo} totalXP={state.totalXP} streak={state.streak} streakShields={state.streakShields ?? 1} currentTitle={currentTitle} />
 
       {/* Tabs */}
       <div style={{
@@ -291,6 +301,52 @@ export default function App() {
 
         {activeTab === 'Dashboard' && (
           <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+            {/* Recalc nudge */}
+            {showRecalcNudge && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.05))',
+                border: '1px solid rgba(245,158,11,0.35)',
+                borderRadius: 'var(--radius)',
+                padding: '14px 18px',
+              }}>
+                <span style={{ fontSize: '22px', flexShrink: 0 }}>⚖️</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--amber)', marginBottom: '2px' }}>
+                    Your targets may need updating
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.5 }}>
+                    You've lost 15+ lbs since your profile was set up. Your calorie and water targets should be recalculated.
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                  <button
+                    onClick={() => { dismissRecalc(); reopenProfile(); }}
+                    style={{
+                      background: 'linear-gradient(135deg, var(--amber-dim), var(--amber))',
+                      color: '#000', fontWeight: 800, fontSize: '12px',
+                      padding: '8px 14px', borderRadius: '8px', letterSpacing: '0.04em',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Recalculate
+                  </button>
+                  <button
+                    onClick={dismissRecalc}
+                    style={{
+                      background: 'var(--surface2)', border: '1px solid var(--border)',
+                      borderRadius: '8px', padding: '8px 12px',
+                      color: 'var(--muted)', fontSize: '12px', fontWeight: 600,
+                    }}
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Stat cards */}
             <div className={bmiData ? 'grid-5' : 'grid-4'} style={{ display: 'grid', gridTemplateColumns: `repeat(${bmiData ? 5 : 4}, 1fr)`, gap: '12px' }}>
